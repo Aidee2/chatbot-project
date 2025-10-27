@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic AI Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* यहाँ पर CSS कोड पेस्ट करें */
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <header class="chat-header">
+            <div class="bot-icon">🤖</div>
+            <h1 class="chat-title">AI Chatbot</h1>
+        </header>
+        
+        <div class="chat-window" id="chat-window">
+            <div class="message bot-message">Hello! How can I help you today?</div>
+            </div>
+
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message..." autofocus>
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <script>
+        
+const chatWindow = document.getElementById('chat-window');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+
+function appendMessage(content, type) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message ' + type;
+    msgDiv.innerText = content;
+    chatWindow.appendChild(msgDiv);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// Send on button click
+sendBtn.addEventListener('click', sendMessage);
+// Send on Enter key
+userInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') sendMessage();
+});
+
+function sendMessage() {
+    const msg = userInput.value.trim();
+    if (!msg) return;
+
+    appendMessage(msg, 'user-message');
+    userInput.value = '';
+
+    // AJAX request to Flask backend
+    const formData = new FormData();
+    formData.append('message', msg);
+
+    fetch('/get_response', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+            appendMessage(data.response, 'bot-message');
+        })
+        .catch(() => {
+            appendMessage('⚠️ Error: Could not connect to bot.', 'bot-message');
+        });
+}
+    </script>
+</body>
+</html>
